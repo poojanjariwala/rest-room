@@ -24,11 +24,11 @@ export const DesktopSidebar = ({ isOwner = false }: { isOwner?: boolean }) => {
     <div className="hidden lg:flex lg:w-80 lg:flex-col lg:fixed lg:inset-y-0 bg-white border-r border-border">
       <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
         <div className="flex items-center flex-shrink-0 px-4 mb-8">
-          <div className="bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center justify-center p-3 shadow-lg mr-3">
+          <div className="bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center justify-center p-2 shadow-lg mr-3">
             <img 
               src="/lovable-uploads/23b453e4-446a-4f0b-adec-4130e91c2bfa.png" 
               alt="RestRoom Logo" 
-              className="w-10 h-10"
+              className="w-14 h-14"
             />
           </div>
           <div>
