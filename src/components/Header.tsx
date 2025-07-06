@@ -20,7 +20,7 @@ export const Header = ({ title, subtitle, showLogout = false, onLogout, logoHeig
               <img 
                 src="/lovable-uploads/23b453e4-446a-4f0b-adec-4130e91c2bfa.png" 
                 alt="RestRoom Logo" 
-                className={logoHeight}
+                className="w-6 h-6"
               />
             </div>
             <div>
