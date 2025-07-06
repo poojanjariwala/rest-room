@@ -28,7 +28,7 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold mb-2">Welcome to RestRoom</h1>
+            <h1 className="text-2xl font-bold mb-2">RestRoom</h1>
             <p className="text-muted-foreground">Choose your account type to continue</p>
           </div>
           
@@ -107,15 +107,13 @@ const Auth = () => {
             
             <Button 
               variant="outline" 
-              className="w-full flex items-center gap-3"
+              className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
               onClick={handleAuth}
             >
-              <img 
-                src="/lovable-uploads/0278111c-03e5-4621-aa81-9d7e032d03a0.png"
-                alt="Google"
-                className="w-5 h-5"
-              />
-              Continue with Google
+              <div className="w-5 h-5 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                G
+              </div>
+              Sign in with Google
             </Button>
             
             <div className="text-center">
@@ -173,15 +171,13 @@ const Auth = () => {
             
             <Button 
               variant="outline" 
-              className="w-full flex items-center gap-3"
+              className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
               onClick={handleAuth}
             >
-              <img 
-                src="/lovable-uploads/0278111c-03e5-4621-aa81-9d7e032d03a0.png"
-                alt="Google"
-                className="w-5 h-5"
-              />
-              Continue with Google
+              <div className="w-5 h-5 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                G
+              </div>
+              Sign in with Google
             </Button>
             
             <div className="text-center">
@@ -211,7 +207,7 @@ const Auth = () => {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-xl font-semibold">Customer Login</h1>
+          <h1 className="text-xl font-semibold">Customer Signup</h1>
         </div>
         
         <Card>
@@ -258,8 +254,15 @@ const Auth = () => {
               <span className="text-sm text-muted-foreground">OR</span>
             </div>
             
-            <Button variant="outline" className="w-full">
-              Continue with Google
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
+              onClick={handleAuth}
+            >
+              <div className="w-5 h-5 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                G
+              </div>
+              Sign in with Google
             </Button>
           </CardContent>
         </Card>
@@ -281,9 +284,6 @@ const Auth = () => {
             </Button>
             <h1 className="text-xl font-semibold">Shop Owner Signup</h1>
           </div>
-          <Button variant="ghost" size="icon">
-            <X className="h-5 w-5" />
-          </Button>
         </div>
         
         <div className="space-y-4">
@@ -375,15 +375,13 @@ const Auth = () => {
           
           <Button 
             variant="outline" 
-            className="w-full flex items-center gap-3"
+            className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
             onClick={handleAuth}
           >
-            <img 
-              src="/lovable-uploads/0278111c-03e5-4621-aa81-9d7e032d03a0.png"
-              alt="Google"
-              className="w-5 h-5"
-            />
-            Continue with Google
+            <div className="w-5 h-5 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+              G
+            </div>
+            Sign in with Google
           </Button>
         </div>
       </div>

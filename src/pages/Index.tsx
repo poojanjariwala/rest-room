@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { User, Store } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +12,7 @@ const Index = () => {
         <CardContent className="p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Welcome to RestRoom
+              RestRoom
             </h1>
             <p className="text-muted-foreground">Choose your account type to continue</p>
           </div>

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, Filter as FilterIcon } from "lucide-react";
+import { Filter as FilterIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -54,17 +54,14 @@ export const Filter = ({ onFilterChange }: FilterProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-4 py-2">
+        <Button variant="outline" className="flex items-center gap-2 bg-white border border-gray-300 rounded-xl px-4 py-2">
           <FilterIcon className="h-4 w-4" />
           <span>Filter</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto rounded-xl">
         <DialogHeader className="flex flex-row items-center justify-between border-b pb-4">
           <DialogTitle>Filter & Sort</DialogTitle>
-          <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
         
         <div className="space-y-6 py-4">
@@ -143,10 +140,10 @@ export const Filter = ({ onFilterChange }: FilterProps) => {
           </div>
           
           <div className="flex gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={handleClearAll} className="flex-1">
+            <Button variant="outline" onClick={handleClearAll} className="flex-1 rounded-xl">
               Clear All
             </Button>
-            <Button onClick={handleApplyFilters} className="flex-1">
+            <Button onClick={handleApplyFilters} className="flex-1 rounded-xl">
               Apply Filters
             </Button>
           </div>
