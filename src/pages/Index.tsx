@@ -21,11 +21,11 @@ const Index = () => {
       <div className="w-full max-w-md space-y-8">
         {/* Logo and Welcome */}
         <div className="text-center">
-          <div className="w-20 h-20 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+          <div className="w-24 h-24 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
             <img 
               src="/lovable-uploads/23b453e4-446a-4f0b-adec-4130e91c2bfa.png" 
               alt="RestRoom Logo" 
-              className="w-8 h-16"
+              className="w-16 h-16"
             />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to RestRoom</h1>

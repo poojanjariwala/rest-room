@@ -16,11 +16,11 @@ export const Header = ({ title, subtitle, showLogout = false, onLogout, logoHeig
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg flex items-center justify-center p-2 shadow-lg">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg flex items-center justify-center p-3 shadow-lg">
               <img 
                 src="/lovable-uploads/23b453e4-446a-4f0b-adec-4130e91c2bfa.png" 
                 alt="RestRoom Logo" 
-                className="w-6 h-6"
+                className="w-8 h-8"
               />
             </div>
             <div>
