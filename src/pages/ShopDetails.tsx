@@ -1,9 +1,14 @@
+
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Star, Wifi, Zap, Car, Coffee, User, Users } from "lucide-react";
+import { ArrowLeft, MapPin, Star, Wifi, Zap, Car, Coffee, User, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import techCafe from "@/assets/tech-cafe.jpg";
+import restaurantWorkspace from "@/assets/restaurant-workspace.jpg";
+import businessLounge from "@/assets/business-lounge.jpg";
 
 const amenityIcons = {
   AC: Zap,
@@ -26,30 +31,103 @@ const shopData = {
     amenities: ["AC", "WiFi", "Charging", "Food"],
     hours: "8:00 AM - 11:00 PM",
     price: 50,
-    seatLayout: Array.from({ length: 30 }, (_, i) => ({
-      id: i + 1,
-      available: i < 25
-    }))
+    type: "Cafe",
+    image: techCafe
+  },
+  2: {
+    name: "Diamond City Rest",
+    address: "Athwa Lines, Surat",
+    rating: 4.6,
+    reviews: 89,
+    totalSeats: 18,
+    availableSeats: 12,
+    occupiedSeats: 6,
+    amenities: ["AC", "Parking", "Washroom"],
+    hours: "7:30 AM - 10:30 PM",
+    price: 50,
+    type: "Restaurant",
+    image: restaurantWorkspace
+  },
+  3: {
+    name: "Relax Zone Surat",
+    address: "Citylight, Surat",
+    rating: 4.4,
+    reviews: 203,
+    totalSeats: 22,
+    availableSeats: 16,
+    occupiedSeats: 6,
+    amenities: ["AC", "WiFi", "Food", "Charging"],
+    hours: "9:00 AM - 12:00 AM",
+    price: 50,
+    type: "Cafe",
+    image: businessLounge
+  },
+  4: {
+    name: "Coffee Corner",
+    address: "Varachha Road, Surat",
+    rating: 4.2,
+    reviews: 78,
+    totalSeats: 15,
+    availableSeats: 8,
+    occupiedSeats: 7,
+    amenities: ["WiFi", "Charging", "Food"],
+    hours: "7:00 AM - 10:00 PM",
+    price: 50,
+    type: "Cafe",
+    image: techCafe
+  },
+  5: {
+    name: "Business Hub",
+    address: "Adajan, Surat",
+    rating: 4.7,
+    reviews: 145,
+    totalSeats: 25,
+    availableSeats: 20,
+    occupiedSeats: 5,
+    amenities: ["AC", "WiFi", "Charging", "Parking"],
+    hours: "6:00 AM - 11:00 PM",
+    price: 50,
+    type: "Business Lounge",
+    image: businessLounge
+  },
+  6: {
+    name: "Quick Bite Cafe",
+    address: "Katargam, Surat",
+    rating: 4.1,
+    reviews: 92,
+    totalSeats: 20,
+    availableSeats: 14,
+    occupiedSeats: 6,
+    amenities: ["AC", "Food", "Washroom"],
+    hours: "8:00 AM - 10:30 PM",
+    price: 50,
+    type: "Restaurant",
+    image: restaurantWorkspace
   }
 };
 
 const ShopDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isBooking, setIsBooking] = useState(false);
+  const { toast } = useToast();
+  const [isRequesting, setIsRequesting] = useState(false);
   
   const shop = shopData[Number(id) as keyof typeof shopData];
   
   if (!shop) {
-    return <div>Shop not found</div>;
+    navigate('/home');
+    return null;
   }
 
-  const handleBookRequest = () => {
-    setIsBooking(true);
-    // Simulate booking request
+  const handleSeatRequest = () => {
+    setIsRequesting(true);
+    // Simulate request sending
     setTimeout(() => {
-      setIsBooking(false);
-      // Navigate to payment or confirmation
+      setIsRequesting(false);
+      toast({
+        title: "Request Sent!",
+        description: "Your seat request has been sent to the shop owner. You'll be notified once they respond.",
+      });
     }, 2000);
   };
 
@@ -68,7 +146,7 @@ const ShopDetails = () => {
           </Button>
           <div>
             <h1 className="text-xl font-semibold">{shop.name}</h1>
-            <div className="text-sm opacity-90">Shop Owner</div>
+            <div className="text-sm opacity-90">Shop Details</div>
           </div>
         </div>
       </div>
@@ -78,8 +156,12 @@ const ShopDetails = () => {
         <Card>
           <CardContent className="p-4">
             <div className="flex gap-3">
-              <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-                <Coffee className="h-8 w-8 text-muted-foreground" />
+              <div className="w-20 h-20 rounded-lg overflow-hidden">
+                <img 
+                  src={shop.image} 
+                  alt={shop.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="flex-1">
                 <h2 className="text-lg font-semibold">{shop.name}</h2>
@@ -87,10 +169,13 @@ const ShopDetails = () => {
                   <MapPin className="h-3 w-3" />
                   <span>{shop.address}</span>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 mb-2">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   <span className="text-sm font-medium">{shop.rating} ({shop.reviews} reviews)</span>
                 </div>
+                <Badge variant="outline" className="text-xs">
+                  {shop.type}
+                </Badge>
               </div>
             </div>
             
@@ -105,6 +190,17 @@ const ShopDetails = () => {
                   </Badge>
                 );
               })}
+            </div>
+
+            {/* Hours and Price */}
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex items-center gap-1 text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                <Clock className="h-3 w-3" />
+                <span>{shop.hours}</span>
+              </div>
+              <div className="bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-medium">
+                ₹{shop.price}/hr
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -131,48 +227,23 @@ const ShopDetails = () => {
           </Card>
         </div>
 
-        {/* Seat Layout */}
+        {/* Request Button */}
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Seat Layout</h3>
-              <Button 
-                onClick={handleBookRequest}
-                disabled={isBooking}
-                className="bg-primary hover:bg-primary/90"
-              >
-                <Users className="h-4 w-4 mr-2" />
-                {isBooking ? "Requesting..." : "Book for Customer"}
-              </Button>
-            </div>
-            
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-muted rounded"></div>
-                <span className="text-sm">Occupied</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-success rounded"></div>
-                <span className="text-sm">Available</span>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-5 gap-2">
-              {shop.seatLayout.map((seat) => (
-                <div
-                  key={seat.id}
-                  className={`
-                    aspect-square rounded flex items-center justify-center text-sm font-medium
-                    ${seat.available 
-                      ? 'bg-success text-success-foreground' 
-                      : 'bg-muted text-muted-foreground'
-                    }
-                  `}
-                >
-                  {seat.id}
-                </div>
-              ))}
-            </div>
+          <CardContent className="p-6 text-center">
+            <h3 className="text-lg font-semibold mb-2">Request a Seat</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Send a request to the shop owner. They will accept or decline your request.
+            </p>
+            <Button 
+              onClick={handleSeatRequest}
+              disabled={isRequesting || shop.availableSeats === 0}
+              className="w-full bg-primary hover:bg-primary/90"
+              size="lg"
+            >
+              {isRequesting ? "Sending Request..." : 
+               shop.availableSeats === 0 ? "No Seats Available" : 
+               "Request Seat"}
+            </Button>
           </CardContent>
         </Card>
       </div>
