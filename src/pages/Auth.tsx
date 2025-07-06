@@ -19,8 +19,12 @@ const Auth = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(['WiFi']);
   const navigate = useNavigate();
 
-  const handleAuth = () => {
+  const handleCustomerAuth = () => {
     navigate('/home');
+  };
+
+  const handleOwnerAuth = () => {
+    navigate('/owner-dashboard');
   };
 
   const renderWelcome = () => (
@@ -28,13 +32,15 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold mb-2">RestRoom</h1>
+            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Welcome to RestRoom
+            </h1>
             <p className="text-muted-foreground">Choose your account type to continue</p>
           </div>
           
           <div className="space-y-4">
             <Card 
-              className="cursor-pointer hover:shadow-md transition-shadow"
+              className="cursor-pointer hover:shadow-lg transition-all hover:scale-[1.02]"
               onClick={() => setMode('customer-login')}
             >
               <CardContent className="p-6">
@@ -49,7 +55,7 @@ const Auth = () => {
             </Card>
             
             <Card 
-              className="cursor-pointer hover:shadow-md transition-shadow"
+              className="cursor-pointer hover:shadow-lg transition-all hover:scale-[1.02]"
               onClick={() => setMode('owner-login')}
             >
               <CardContent className="p-6">
@@ -96,7 +102,7 @@ const Auth = () => {
             
             <Button 
               className="w-full" 
-              onClick={handleAuth}
+              onClick={handleCustomerAuth}
             >
               Login
             </Button>
@@ -108,11 +114,13 @@ const Auth = () => {
             <Button 
               variant="outline" 
               className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
-              onClick={handleAuth}
+              onClick={handleCustomerAuth}
             >
-              <div className="w-5 h-5 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                G
-              </div>
+              <img 
+                src="/lovable-uploads/98076ada-1afe-45dc-b76b-cd228923d9f1.png" 
+                alt="Google" 
+                className="w-5 h-5"
+              />
               Sign in with Google
             </Button>
             
@@ -160,7 +168,7 @@ const Auth = () => {
             
             <Button 
               className="w-full" 
-              onClick={handleAuth}
+              onClick={handleOwnerAuth}
             >
               Login
             </Button>
@@ -172,11 +180,13 @@ const Auth = () => {
             <Button 
               variant="outline" 
               className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
-              onClick={handleAuth}
+              onClick={handleOwnerAuth}
             >
-              <div className="w-5 h-5 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                G
-              </div>
+              <img 
+                src="/lovable-uploads/98076ada-1afe-45dc-b76b-cd228923d9f1.png" 
+                alt="Google" 
+                className="w-5 h-5"
+              />
               Sign in with Google
             </Button>
             
@@ -245,7 +255,7 @@ const Auth = () => {
             
             <Button 
               className="w-full" 
-              onClick={handleAuth}
+              onClick={handleCustomerAuth}
             >
               Sign Up
             </Button>
@@ -257,11 +267,13 @@ const Auth = () => {
             <Button 
               variant="outline" 
               className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
-              onClick={handleAuth}
+              onClick={handleCustomerAuth}
             >
-              <div className="w-5 h-5 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                G
-              </div>
+              <img 
+                src="/lovable-uploads/98076ada-1afe-45dc-b76b-cd228923d9f1.png" 
+                alt="Google" 
+                className="w-5 h-5"
+              />
               Sign in with Google
             </Button>
           </CardContent>
@@ -364,7 +376,7 @@ const Auth = () => {
           
           <Button 
             className="w-full" 
-            onClick={handleAuth}
+            onClick={handleOwnerAuth}
           >
             Sign Up
           </Button>
@@ -376,11 +388,13 @@ const Auth = () => {
           <Button 
             variant="outline" 
             className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
-            onClick={handleAuth}
+            onClick={handleOwnerAuth}
           >
-            <div className="w-5 h-5 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-              G
-            </div>
+            <img 
+              src="/lovable-uploads/98076ada-1afe-45dc-b76b-cd228923d9f1.png" 
+              alt="Google" 
+              className="w-5 h-5"
+            />
             Sign in with Google
           </Button>
         </div>

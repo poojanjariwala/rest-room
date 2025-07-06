@@ -1,14 +1,23 @@
+
 import { User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
+import { useNavigate } from "react-router-dom";
 
 const Account = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header 
         title="RestRoom"
         showLogout={true}
+        onLogout={handleLogout}
       />
 
       <div className="p-4 pb-20">
