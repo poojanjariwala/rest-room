@@ -11,8 +11,8 @@ const navItems = [
 
 const ownerNavItems = [
   { id: 'home', label: 'Home', icon: Home, path: '/owner-dashboard' },
-  { id: 'history', label: 'History', icon: History, path: '/history' },
-  { id: 'account', label: 'Account', icon: User, path: '/account' },
+  { id: 'history', label: 'History', icon: History, path: '/owner-history' },
+  { id: 'account', label: 'Account', icon: User, path: '/owner-account' },
 ];
 
 export const BottomNav = ({ isOwner = false }: { isOwner?: boolean }) => {

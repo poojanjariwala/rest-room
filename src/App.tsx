@@ -11,6 +11,8 @@ import History from "./pages/History";
 import ShopDetails from "./pages/ShopDetails";
 import Auth from "./pages/Auth";
 import OwnerDashboard from "./pages/OwnerDashboard";
+import OwnerHistory from "./pages/OwnerHistory";
+import OwnerAccount from "./pages/OwnerAccount";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/shop/:id" element={<ShopDetails />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+          <Route path="/owner-history" element={<OwnerHistory />} />
+          <Route path="/owner-account" element={<OwnerAccount />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

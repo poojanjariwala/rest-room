@@ -10,13 +10,13 @@ interface HeaderProps {
   logoHeight?: string;
 }
 
-export const Header = ({ title, subtitle, showLogout = false, onLogout, logoHeight = "w-8 h-8" }: HeaderProps) => {
+export const Header = ({ title, subtitle, showLogout = false, onLogout, logoHeight = "w-6 h-12" }: HeaderProps) => {
   return (
     <div className="bg-gradient-to-r from-primary to-accent text-white">
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-white/20 rounded-full flex items-center justify-center p-2">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg flex items-center justify-center p-2 shadow-lg">
               <img 
                 src="/lovable-uploads/23b453e4-446a-4f0b-adec-4130e91c2bfa.png" 
                 alt="RestRoom Logo" 

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ArrowLeft, X, User, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,8 +32,8 @@ const Auth = () => {
   };
 
   const renderCustomerLogin = () => (
-    <div className="min-h-screen bg-background">
-      <div className="p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
         <div className="flex items-center gap-3 mb-6">
           <Button 
             variant="ghost" 
@@ -97,8 +98,8 @@ const Auth = () => {
   );
 
   const renderOwnerLogin = () => (
-    <div className="min-h-screen bg-background">
-      <div className="p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
         <div className="flex items-center gap-3 mb-6">
           <Button 
             variant="ghost" 
@@ -163,8 +164,8 @@ const Auth = () => {
   );
 
   const renderCustomerSignup = () => (
-    <div className="min-h-screen bg-background">
-      <div className="p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
         <div className="flex items-center gap-3 mb-6">
           <Button 
             variant="ghost" 
@@ -239,8 +240,8 @@ const Auth = () => {
   );
 
   const renderOwnerSignup = () => (
-    <div className="min-h-screen bg-background">
-      <div className="p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Button 
