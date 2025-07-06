@@ -10,9 +10,9 @@ interface HeaderProps {
   logoHeight?: string;
 }
 
-export const Header = ({ title, subtitle, showLogout = false, onLogout, logoHeight = "w-6 h-12" }: HeaderProps) => {
+export const Header = ({ title, subtitle, showLogout = false, onLogout, logoHeight = "w-8 h-8" }: HeaderProps) => {
   return (
-    <div className="bg-gradient-to-r from-primary to-accent text-white">
+    <div className="sticky top-0 z-50 bg-gradient-to-r from-primary to-accent text-white">
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

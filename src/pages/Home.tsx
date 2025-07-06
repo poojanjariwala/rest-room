@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, MapPin, Star, Wifi, Zap, Car, Coffee, User, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
 import { Filter } from "@/components/Filter";
+import { DesktopSidebar } from "@/components/DesktopSidebar";
 import { useNavigate } from "react-router-dom";
 import techCafe from "@/assets/tech-cafe.jpg";
 import restaurantWorkspace from "@/assets/restaurant-workspace.jpg";
@@ -177,106 +179,118 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      <Header 
-        title="RestRoom"
-        subtitle="Surat, Gujarat"
-        showLogout={true}
-        onLogout={handleLogout}
-      />
+      <DesktopSidebar />
+      
+      <div className="lg:pl-80">
+        <Header 
+          title="RestRoom"
+          subtitle="Surat, Gujarat"
+          showLogout={true}
+          onLogout={handleLogout}
+          logoHeight="w-12 h-8"
+        />
 
-      {/* Search Section */}
-      <div className="p-4 space-y-4">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search shops..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+        {/* Search Section */}
+        <div className="p-4 space-y-4">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search shops or areas..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Filter onFilterChange={handleFilterChange} />
           </div>
-          <Filter onFilterChange={handleFilterChange} />
+        </div>
+
+        {/* Shop Listings */}
+        <div className="px-4 pb-20 lg:pb-4 space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {searchFilteredShops.map((shop) => (
+              <Card 
+                key={shop.id} 
+                className="cursor-pointer transition-all hover:shadow-lg"
+                onClick={() => handleShopClick(shop.id)}
+              >
+                <CardContent className="p-4">
+                  <div className="flex gap-3">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                      <img 
+                        src={shop.image} 
+                        alt={shop.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-foreground">{shop.name}</h3>
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
+                            <MapPin className="h-3 w-3" />
+                            <span>{shop.address}</span>
+                          </div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                              <span className="text-sm font-medium">{shop.rating}</span>
+                            </div>
+                            <Badge 
+                              variant="outline" 
+                              className={`text-xs px-2 py-0.5 ${typeColors[shop.type as keyof typeof typeColors] || 'bg-gray-100 text-gray-800'}`}
+                            >
+                              {shop.type}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <div className="text-right flex flex-col items-end gap-1">
+                          <div className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">
+                            {shop.distance}km
+                          </div>
+                          <div className="bg-success/10 text-success px-2 py-1 rounded-full text-xs font-medium">
+                            {shop.availableSeats}/{shop.totalSeats}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Amenities */}
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        {shop.amenities.slice(0, 4).map((amenity) => {
+                          const Icon = amenityIcons[amenity as keyof typeof amenityIcons];
+                          return (
+                            <Badge key={amenity} variant="outline" className="text-xs flex items-center gap-1">
+                              <Icon className="h-3 w-3" />
+                              {amenity}
+                            </Badge>
+                          );
+                        })}
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                          <Clock className="h-3 w-3" />
+                          <span>{shop.hours}</span>
+                        </div>
+                        <div className="bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
+                          ₹{shop.price}/hr
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Shop Listings */}
-      <div className="px-4 pb-20 space-y-4">
-        {searchFilteredShops.map((shop) => (
-          <Card 
-            key={shop.id} 
-            className="cursor-pointer transition-all hover:shadow-lg"
-            onClick={() => handleShopClick(shop.id)}
-          >
-            <CardContent className="p-4">
-              <div className="flex gap-3">
-                <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                  <img 
-                    src={shop.image} 
-                    alt={shop.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground">{shop.name}</h3>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
-                        <MapPin className="h-3 w-3" />
-                        <span>{shop.address}</span>
-                      </div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex items-center gap-1">
-                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">{shop.rating}</span>
-                        </div>
-                        <Badge 
-                          variant="outline" 
-                          className={`text-xs px-2 py-0.5 ${typeColors[shop.type as keyof typeof typeColors] || 'bg-gray-100 text-gray-800'}`}
-                        >
-                          {shop.type}
-                        </Badge>
-                      </div>
-                    </div>
-                    
-                    <div className="text-right flex flex-col items-end gap-1">
-                      <div className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">
-                        {shop.distance}km
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Amenities */}
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    {shop.amenities.slice(0, 4).map((amenity) => {
-                      const Icon = amenityIcons[amenity as keyof typeof amenityIcons];
-                      return (
-                        <Badge key={amenity} variant="outline" className="text-xs flex items-center gap-1">
-                          <Icon className="h-3 w-3" />
-                          {amenity}
-                        </Badge>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-                      <Clock className="h-3 w-3" />
-                      <span>{shop.hours}</span>
-                    </div>
-                    <div className="bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
-                      ₹{shop.price}/hr
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="lg:hidden">
+        <BottomNav />
       </div>
-
-      <BottomNav />
     </div>
   );
 };
