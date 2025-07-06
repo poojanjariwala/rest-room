@@ -7,19 +7,20 @@ interface HeaderProps {
   subtitle?: string;
   showLogout?: boolean;
   onLogout?: () => void;
+  logoHeight?: string;
 }
 
-export const Header = ({ title, subtitle, showLogout = false, onLogout }: HeaderProps) => {
+export const Header = ({ title, subtitle, showLogout = false, onLogout, logoHeight = "w-8 h-8" }: HeaderProps) => {
   return (
     <div className="bg-gradient-to-r from-primary to-accent text-white">
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <div className="bg-white/20 rounded-full flex items-center justify-center p-2">
               <img 
                 src="/lovable-uploads/23b453e4-446a-4f0b-adec-4130e91c2bfa.png" 
                 alt="RestRoom Logo" 
-                className="w-8 h-8"
+                className={logoHeight}
               />
             </div>
             <div>

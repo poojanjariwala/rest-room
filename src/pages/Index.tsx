@@ -1,55 +1,56 @@
 
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Store } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { User, Store } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
 
+  const handleCustomerLogin = () => {
+    navigate('/auth?type=customer');
+  };
+
+  const handleOwnerLogin = () => {
+    navigate('/auth?type=owner');
+  };
+
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              RestRoom
-            </h1>
-            <p className="text-muted-foreground">Choose your account type to continue</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-8">
+        {/* Logo and Welcome */}
+        <div className="text-center">
+          <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+            <img 
+              src="/lovable-uploads/23b453e4-446a-4f0b-adec-4130e91c2bfa.png" 
+              alt="RestRoom Logo" 
+              className="w-12 h-12"
+            />
           </div>
-          
-          <div className="space-y-4">
-            <Card 
-              className="cursor-pointer hover:shadow-lg transition-all hover:scale-[1.02]"
-              onClick={() => navigate('/auth')}
-            >
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                    <User className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Customer</h3>
-                  <p className="text-sm text-muted-foreground">Find and book workspace seats</p>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card 
-              className="cursor-pointer hover:shadow-lg transition-all hover:scale-[1.02]"
-              onClick={() => navigate('/auth')}
-            >
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-4">
-                    <Store className="h-8 w-8 text-success" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Shop Owner</h3>
-                  <p className="text-sm text-muted-foreground">Manage your workspace and bookings</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to RestRoom</h1>
+          <p className="text-gray-600">Choose your login type</p>
+        </div>
+
+        {/* Login Options */}
+        <div className="space-y-4">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={handleCustomerLogin}>
+            <CardContent className="p-6 text-center">
+              <User className="w-12 h-12 text-primary mx-auto mb-3" />
+              <h3 className="text-xl font-semibold mb-2">Customer</h3>
+              <p className="text-gray-600 text-sm">Find and book seats at local shops</p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={handleOwnerLogin}>
+            <CardContent className="p-6 text-center">
+              <Store className="w-12 h-12 text-primary mx-auto mb-3" />
+              <h3 className="text-xl font-semibold mb-2">Shop Owner</h3>
+              <p className="text-gray-600 text-sm">Manage your shop and customer requests</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

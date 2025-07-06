@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
+import { useToast } from "@/hooks/use-toast";
 import techCafe from "@/assets/tech-cafe.jpg";
 
 const amenityIcons = {
@@ -20,7 +21,8 @@ const amenityIcons = {
 
 const OwnerDashboard = () => {
   const navigate = useNavigate();
-  const [requests] = useState([
+  const { toast } = useToast();
+  const [requests, setRequests] = useState([
     {
       id: 1,
       customerName: "John Doe",
@@ -48,6 +50,22 @@ const OwnerDashboard = () => {
     navigate('/');
   };
 
+  const handleAccept = (requestId: number) => {
+    setRequests(requests.filter(req => req.id !== requestId));
+    toast({
+      title: "Request Accepted",
+      description: "Customer has been notified about the seat approval.",
+    });
+  };
+
+  const handleDecline = (requestId: number) => {
+    setRequests(requests.filter(req => req.id !== requestId));
+    toast({
+      title: "Request Declined",
+      description: "Request has been declined.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header 
@@ -55,9 +73,10 @@ const OwnerDashboard = () => {
         subtitle="Shop Owner"
         showLogout={true}
         onLogout={handleLogout}
+        logoHeight="h-12 w-12"
       />
 
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-6 pb-20">
         {/* Shop Info Card */}
         <Card>
           <CardContent className="p-4">
@@ -112,8 +131,19 @@ const OwnerDashboard = () => {
                         <p className="text-sm text-muted-foreground">{request.requestTime}</p>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">Decline</Button>
-                        <Button size="sm">Accept</Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleDecline(request.id)}
+                        >
+                          Decline
+                        </Button>
+                        <Button 
+                          size="sm"
+                          onClick={() => handleAccept(request.id)}
+                        >
+                          Accept
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -130,7 +160,7 @@ const OwnerDashboard = () => {
         </div>
       </div>
 
-      <BottomNav />
+      <BottomNav isOwner={true} />
     </div>
   );
 };
