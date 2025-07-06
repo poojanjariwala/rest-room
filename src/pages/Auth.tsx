@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ArrowLeft, X, User, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,6 @@ const Auth = () => {
   const navigate = useNavigate();
 
   const handleAuth = () => {
-    // Simulate successful auth
     navigate('/home');
   };
 
@@ -105,7 +105,16 @@ const Auth = () => {
               <span className="text-sm text-muted-foreground">OR</span>
             </div>
             
-            <Button variant="outline" className="w-full">
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center gap-3"
+              onClick={handleAuth}
+            >
+              <img 
+                src="/lovable-uploads/0278111c-03e5-4621-aa81-9d7e032d03a0.png"
+                alt="Google"
+                className="w-5 h-5"
+              />
               Continue with Google
             </Button>
             
@@ -115,6 +124,72 @@ const Auth = () => {
                 variant="link" 
                 className="p-0 h-auto"
                 onClick={() => setMode('customer-signup')}
+              >
+                Sign up
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const renderOwnerLogin = () => (
+    <div className="min-h-screen bg-background">
+      <div className="p-4">
+        <div className="flex items-center gap-3 mb-6">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => setMode('welcome')}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-xl font-semibold">Shop Owner Login</h1>
+        </div>
+        
+        <Card>
+          <CardContent className="p-6 space-y-4">
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" placeholder="Enter your email" />
+            </div>
+            
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" placeholder="Enter your password" />
+            </div>
+            
+            <Button 
+              className="w-full" 
+              onClick={handleAuth}
+            >
+              Login
+            </Button>
+            
+            <div className="text-center">
+              <span className="text-sm text-muted-foreground">OR</span>
+            </div>
+            
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center gap-3"
+              onClick={handleAuth}
+            >
+              <img 
+                src="/lovable-uploads/0278111c-03e5-4621-aa81-9d7e032d03a0.png"
+                alt="Google"
+                className="w-5 h-5"
+              />
+              Continue with Google
+            </Button>
+            
+            <div className="text-center">
+              <span className="text-sm text-muted-foreground">Don't have an account? </span>
+              <Button 
+                variant="link" 
+                className="p-0 h-auto"
+                onClick={() => setMode('owner-signup')}
               >
                 Sign up
               </Button>
@@ -204,7 +279,7 @@ const Auth = () => {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-xl font-semibold">Shop Owner Login</h1>
+            <h1 className="text-xl font-semibold">Shop Owner Signup</h1>
           </div>
           <Button variant="ghost" size="icon">
             <X className="h-5 w-5" />
@@ -298,7 +373,16 @@ const Auth = () => {
             <span className="text-sm text-muted-foreground">OR</span>
           </div>
           
-          <Button variant="outline" className="w-full">
+          <Button 
+            variant="outline" 
+            className="w-full flex items-center gap-3"
+            onClick={handleAuth}
+          >
+            <img 
+              src="/lovable-uploads/0278111c-03e5-4621-aa81-9d7e032d03a0.png"
+              alt="Google"
+              className="w-5 h-5"
+            />
             Continue with Google
           </Button>
         </div>
@@ -314,7 +398,7 @@ const Auth = () => {
     case 'customer-signup':
       return renderCustomerSignup();
     case 'owner-login':
-      return renderCustomerLogin(); // Same as customer login for simplicity
+      return renderOwnerLogin();
     case 'owner-signup':
       return renderOwnerSignup();
     default:

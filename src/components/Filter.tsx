@@ -1,62 +1,76 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { X, Filter as FilterIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-const shopTypes = ['All', 'Cafe', 'Restaurant', 'Barber Shop', 'Chai Stall', 'Business Lounge'];
-const amenities = ['WiFi', 'AC', 'Parking', 'Food', 'Charging', 'Washroom'];
+const shopTypes = ['All Types', 'Cafe', 'Restaurant', 'Barber Shop', 'Chai Stall', 'Business Lounge'];
+const amenities = ['Air Conditioning', 'WiFi', 'Parking', 'Food Available', 'Charging Points', 'Washroom'];
+const sortOptions = ['Distance', 'Rating', 'Availability'];
 
 interface FilterProps {
   onFilterChange: (filters: any) => void;
 }
 
 export const Filter = ({ onFilterChange }: FilterProps) => {
-  const [selectedType, setSelectedType] = useState('All');
+  const [selectedType, setSelectedType] = useState('All Types');
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState('Distance');
+  const [maxDistance, setMaxDistance] = useState([5]);
+  const [minRating, setMinRating] = useState([1]);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleApplyFilters = () => {
     onFilterChange({
       type: selectedType,
-      amenities: selectedAmenities
+      amenities: selectedAmenities,
+      sortBy,
+      maxDistance: maxDistance[0],
+      minRating: minRating[0]
     });
     setIsOpen(false);
   };
 
-  const handleClearFilters = () => {
-    setSelectedType('All');
+  const handleClearAll = () => {
+    setSelectedType('All Types');
     setSelectedAmenities([]);
+    setSortBy('Distance');
+    setMaxDistance([5]);
+    setMinRating([1]);
     onFilterChange({
-      type: 'All',
-      amenities: []
+      type: 'All Types',
+      amenities: [],
+      sortBy: 'Distance',
+      maxDistance: 5,
+      minRating: 1
     });
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex-shrink-0">
-          Filter
+        <Button variant="outline" className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-4 py-2">
+          <FilterIcon className="h-4 w-4" />
+          <span>Filter</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md mx-auto">
-        <DialogHeader className="flex flex-row items-center justify-between">
-          <DialogTitle>Filters</DialogTitle>
+      <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="flex flex-row items-center justify-between border-b pb-4">
+          <DialogTitle>Filter & Sort</DialogTitle>
           <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
             <X className="h-4 w-4" />
           </Button>
         </DialogHeader>
         
-        <div className="space-y-6">
+        <div className="space-y-6 py-4">
           <div>
-            <Label className="text-base font-semibold">Shop Type</Label>
-            <RadioGroup value={selectedType} onValueChange={setSelectedType} className="mt-2">
+            <Label className="text-base font-semibold mb-3 block">Shop Type</Label>
+            <RadioGroup value={selectedType} onValueChange={setSelectedType} className="space-y-2">
               {shopTypes.map((type) => (
                 <div key={type} className="flex items-center space-x-2">
                   <RadioGroupItem value={type} id={type} />
@@ -67,8 +81,48 @@ export const Filter = ({ onFilterChange }: FilterProps) => {
           </div>
           
           <div>
-            <Label className="text-base font-semibold">Amenities</Label>
-            <div className="mt-2 space-y-2">
+            <Label className="text-base font-semibold mb-3 block">Sort By</Label>
+            <RadioGroup value={sortBy} onValueChange={setSortBy} className="space-y-2">
+              {sortOptions.map((option) => (
+                <div key={option} className="flex items-center space-x-2">
+                  <RadioGroupItem value={option} id={option} />
+                  <Label htmlFor={option}>{option}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+          
+          <div>
+            <Label className="text-base font-semibold mb-3 block">
+              Maximum Distance: {maxDistance[0]} km
+            </Label>
+            <Slider
+              value={maxDistance}
+              onValueChange={setMaxDistance}
+              max={10}
+              min={1}
+              step={0.5}
+              className="w-full"
+            />
+          </div>
+          
+          <div>
+            <Label className="text-base font-semibold mb-3 block">
+              Minimum Rating: {minRating[0]} stars
+            </Label>
+            <Slider
+              value={minRating}
+              onValueChange={setMinRating}
+              max={5}
+              min={1}
+              step={0.5}
+              className="w-full"
+            />
+          </div>
+          
+          <div>
+            <Label className="text-base font-semibold mb-3 block">Amenities</Label>
+            <div className="space-y-2">
               {amenities.map((amenity) => (
                 <div key={amenity} className="flex items-center space-x-2">
                   <Checkbox 
@@ -88,12 +142,12 @@ export const Filter = ({ onFilterChange }: FilterProps) => {
             </div>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-2 pt-4 border-t">
+            <Button variant="outline" onClick={handleClearAll} className="flex-1">
+              Clear All
+            </Button>
             <Button onClick={handleApplyFilters} className="flex-1">
               Apply Filters
-            </Button>
-            <Button variant="outline" onClick={handleClearFilters}>
-              Clear
             </Button>
           </div>
         </div>

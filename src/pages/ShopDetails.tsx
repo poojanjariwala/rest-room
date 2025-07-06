@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Star, Wifi, Zap, Car, Coffee, User, Clock } from "lucide-react";
@@ -106,6 +105,14 @@ const shopData = {
   }
 };
 
+const typeColors = {
+  'Cafe': 'bg-orange-100 text-orange-800',
+  'Restaurant': 'bg-green-100 text-green-800',
+  'Business Lounge': 'bg-purple-100 text-purple-800',
+  'Barber Shop': 'bg-blue-100 text-blue-800',
+  'Chai Stall': 'bg-yellow-100 text-yellow-800'
+};
+
 const ShopDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -121,7 +128,6 @@ const ShopDetails = () => {
 
   const handleSeatRequest = () => {
     setIsRequesting(true);
-    // Simulate request sending
     setTimeout(() => {
       setIsRequesting(false);
       toast({
@@ -152,35 +158,40 @@ const ShopDetails = () => {
       </div>
 
       <div className="p-4 space-y-6">
+        {/* Shop Image */}
+        <div className="w-full h-48 rounded-lg overflow-hidden">
+          <img 
+            src={shop.image} 
+            alt={shop.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+
         {/* Shop Info */}
         <Card>
           <CardContent className="p-4">
-            <div className="flex gap-3">
-              <div className="w-20 h-20 rounded-lg overflow-hidden">
-                <img 
-                  src={shop.image} 
-                  alt={shop.name}
-                  className="w-full h-full object-cover"
-                />
+            <div>
+              <h2 className="text-lg font-semibold mb-2">{shop.name}</h2>
+              <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
+                <MapPin className="h-3 w-3" />
+                <span>{shop.address}</span>
               </div>
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold">{shop.name}</h2>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
-                  <MapPin className="h-3 w-3" />
-                  <span>{shop.address}</span>
-                </div>
-                <div className="flex items-center gap-1 mb-2">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   <span className="text-sm font-medium">{shop.rating} ({shop.reviews} reviews)</span>
                 </div>
-                <Badge variant="outline" className="text-xs">
+                <Badge 
+                  variant="outline" 
+                  className={`text-xs ${typeColors[shop.type as keyof typeof typeColors] || 'bg-gray-100 text-gray-800'}`}
+                >
                   {shop.type}
                 </Badge>
               </div>
             </div>
             
             {/* Amenities */}
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mb-4 flex flex-wrap gap-2">
               {shop.amenities.map((amenity) => {
                 const Icon = amenityIcons[amenity as keyof typeof amenityIcons];
                 return (
@@ -193,7 +204,7 @@ const ShopDetails = () => {
             </div>
 
             {/* Hours and Price */}
-            <div className="mt-4 flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-1 text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
                 <Clock className="h-3 w-3" />
                 <span>{shop.hours}</span>
@@ -204,28 +215,6 @@ const ShopDetails = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Seat Stats */}
-        <div className="grid grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-primary">{shop.totalSeats}</div>
-              <div className="text-sm text-muted-foreground">Total Seats</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-success">{shop.availableSeats}</div>
-              <div className="text-sm text-muted-foreground">Available</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-destructive">{shop.occupiedSeats}</div>
-              <div className="text-sm text-muted-foreground">Occupied</div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Request Button */}
         <Card>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, MapPin, Star, Wifi, Zap, Car, Coffee, User, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -115,6 +114,14 @@ const amenityIcons = {
   Washroom: User
 };
 
+const typeColors = {
+  'Cafe': 'bg-orange-100 text-orange-800',
+  'Restaurant': 'bg-green-100 text-green-800',
+  'Business Lounge': 'bg-purple-100 text-purple-800',
+  'Barber Shop': 'bg-blue-100 text-blue-800',
+  'Chai Stall': 'bg-yellow-100 text-yellow-800'
+};
+
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredShops, setFilteredShops] = useState(shops);
@@ -124,17 +131,40 @@ const Home = () => {
     navigate(`/shop/${shopId}`);
   };
 
+  const handleLogout = () => {
+    navigate('/');
+  };
+
   const handleFilterChange = (filters: any) => {
     let filtered = shops;
     
-    if (filters.type && filters.type !== 'All') {
+    if (filters.type && filters.type !== 'All Types') {
       filtered = filtered.filter(shop => shop.type === filters.type);
     }
     
     if (filters.amenities && filters.amenities.length > 0) {
       filtered = filtered.filter(shop => 
-        filters.amenities.some((amenity: string) => shop.amenities.includes(amenity))
+        filters.amenities.some((amenity: string) => {
+          const amenityMap: { [key: string]: string } = {
+            'Air Conditioning': 'AC',
+            'WiFi': 'WiFi',
+            'Parking': 'Parking',
+            'Food Available': 'Food',
+            'Charging Points': 'Charging',
+            'Washroom': 'Washroom'
+          };
+          return shop.amenities.includes(amenityMap[amenity] || amenity);
+        })
       );
+    }
+    
+    // Sort by selected option
+    if (filters.sortBy === 'Rating') {
+      filtered.sort((a, b) => b.rating - a.rating);
+    } else if (filters.sortBy === 'Availability') {
+      filtered.sort((a, b) => b.availableSeats - a.availableSeats);
+    } else {
+      filtered.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
     }
     
     setFilteredShops(filtered);
@@ -145,20 +175,13 @@ const Home = () => {
     shop.address.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalStats = {
-    shops: shops.length,
-    availableSeats: shops.reduce((sum, shop) => sum + shop.availableSeats, 0),
-    totalSeats: shops.reduce((sum, shop) => sum + shop.totalSeats, 0)
-  };
-
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Header 
         title="RestRoom"
         subtitle="Surat, Gujarat"
         showLogout={true}
-        showStats={true}
-        stats={totalStats}
+        onLogout={handleLogout}
       />
 
       {/* Search Section */}
@@ -208,19 +231,16 @@ const Home = () => {
                           <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                           <span className="text-sm font-medium">{shop.rating}</span>
                         </div>
-                        <Badge variant="outline" className="text-xs px-2 py-0.5">
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs px-2 py-0.5 ${typeColors[shop.type as keyof typeof typeColors] || 'bg-gray-100 text-gray-800'}`}
+                        >
                           {shop.type}
                         </Badge>
                       </div>
                     </div>
                     
                     <div className="text-right flex flex-col items-end gap-1">
-                      <Badge 
-                        variant="secondary" 
-                        className="bg-success text-success-foreground"
-                      >
-                        {shop.availableSeats}/{shop.totalSeats}
-                      </Badge>
                       <div className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">
                         {shop.distance}km
                       </div>
