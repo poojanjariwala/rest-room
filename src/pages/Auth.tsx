@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ArrowLeft, X, User, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,15 +6,19 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-type AuthMode = 'welcome' | 'customer-login' | 'customer-signup' | 'owner-login' | 'owner-signup';
+type AuthMode = 'customer-login' | 'customer-signup' | 'owner-login' | 'owner-signup';
 
 const shopTypes = ['Cafe', 'Restaurant', 'Barber Shop', 'Chai Stall', 'Business Lounge'];
 const amenities = ['WiFi', 'AC', 'Parking', 'Food', 'Charging', 'Washroom'];
 
 const Auth = () => {
-  const [mode, setMode] = useState<AuthMode>('welcome');
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get('type');
+  const [mode, setMode] = useState<AuthMode>(
+    type === 'owner' ? 'owner-login' : 'customer-login'
+  );
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(['WiFi']);
   const navigate = useNavigate();
 
@@ -27,53 +30,6 @@ const Auth = () => {
     navigate('/owner-dashboard');
   };
 
-  const renderWelcome = () => (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Welcome to RestRoom
-            </h1>
-            <p className="text-muted-foreground">Choose your account type to continue</p>
-          </div>
-          
-          <div className="space-y-4">
-            <Card 
-              className="cursor-pointer hover:shadow-lg transition-all hover:scale-[1.02]"
-              onClick={() => setMode('customer-login')}
-            >
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                    <User className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Customer</h3>
-                  <p className="text-sm text-muted-foreground">Find and book workspace seats</p>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card 
-              className="cursor-pointer hover:shadow-lg transition-all hover:scale-[1.02]"
-              onClick={() => setMode('owner-login')}
-            >
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-4">
-                    <Store className="h-8 w-8 text-success" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Shop Owner</h3>
-                  <p className="text-sm text-muted-foreground">Manage your workspace and bookings</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
   const renderCustomerLogin = () => (
     <div className="min-h-screen bg-background">
       <div className="p-4">
@@ -81,7 +37,7 @@ const Auth = () => {
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={() => setMode('welcome')}
+            onClick={() => navigate('/')}
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -147,7 +103,7 @@ const Auth = () => {
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={() => setMode('welcome')}
+            onClick={() => navigate('/')}
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -245,8 +201,8 @@ const Auth = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="city">City</Label>
-                <Input id="city" />
-              </div>
+              <Input id="city" />
+            </div>
               <div>
                 <Label htmlFor="state">State</Label>
                 <Input id="state" />
@@ -403,8 +359,6 @@ const Auth = () => {
   );
 
   switch (mode) {
-    case 'welcome':
-      return renderWelcome();
     case 'customer-login':
       return renderCustomerLogin();
     case 'customer-signup':
@@ -414,7 +368,7 @@ const Auth = () => {
     case 'owner-signup':
       return renderOwnerSignup();
     default:
-      return renderWelcome();
+      return renderCustomerLogin();
   }
 };
 

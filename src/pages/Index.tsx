@@ -21,7 +21,7 @@ const Index = () => {
       <div className="w-full max-w-md space-y-8">
         {/* Logo and Welcome */}
         <div className="text-center">
-          <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-20 h-20 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
             <img 
               src="/lovable-uploads/23b453e4-446a-4f0b-adec-4130e91c2bfa.png" 
               alt="RestRoom Logo" 
