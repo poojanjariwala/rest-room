@@ -20,15 +20,19 @@ export const DesktopSidebar = ({ isOwner = false }: { isOwner?: boolean }) => {
   const location = useLocation();
   const items = isOwner ? ownerNavItems : navItems;
 
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
   return (
     <div className="hidden lg:flex lg:w-80 lg:flex-col lg:fixed lg:inset-y-0 bg-white border-r border-border">
       <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
         <div className="flex items-center flex-shrink-0 px-4 mb-8">
-          <div className="bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center justify-center p-2 shadow-lg mr-3">
+          <div className="bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center justify-center p-1.5 shadow-lg mr-3">
             <img 
               src="/lovable-uploads/23b453e4-446a-4f0b-adec-4130e91c2bfa.png" 
               alt="RestRoom Logo" 
-              className="w-14 h-14"
+              className="w-12 h-12"
             />
           </div>
           <div>
@@ -48,9 +52,9 @@ export const DesktopSidebar = ({ isOwner = false }: { isOwner?: boolean }) => {
             return (
               <button
                 key={item.id}
-                onClick={() => navigate(item.path)}
+                onClick={() => handleNavigation(item.path)}
                 className={cn(
-                  "group flex items-center px-4 py-3 text-sm font-medium rounded-lg w-full transition-colors",
+                  "group flex items-center px-4 py-3 text-sm font-medium rounded-lg w-full transition-colors cursor-pointer",
                   isActive 
                     ? "bg-primary text-white" 
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
