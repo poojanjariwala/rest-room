@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Star, Wifi, Zap, Car, Coffee, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
 import { useToast } from "@/hooks/use-toast";
+import { historyService, HistoryRequest } from "@/services/historyService";
 import techCafe from "@/assets/tech-cafe.jpg";
 
 const amenityIcons = {
@@ -22,20 +22,7 @@ const amenityIcons = {
 const OwnerDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [requests, setRequests] = useState([
-    {
-      id: 1,
-      customerName: "John Doe",
-      requestTime: "2 mins ago",
-      status: "pending"
-    },
-    {
-      id: 2,
-      customerName: "Jane Smith",
-      requestTime: "5 mins ago", 
-      status: "pending"
-    }
-  ]);
+  const [requests, setRequests] = useState<HistoryRequest[]>([]);
 
   const shop = {
     name: "Tech Hub Cafe",
@@ -46,11 +33,19 @@ const OwnerDashboard = () => {
     image: techCafe
   };
 
+  useEffect(() => {
+    // Load pending requests from history
+    const ownerHistory = historyService.getOwnerHistory();
+    const pendingRequests = ownerHistory.filter(req => req.status === 'pending');
+    setRequests(pendingRequests);
+  }, []);
+
   const handleLogout = () => {
     navigate('/');
   };
 
-  const handleAccept = (requestId: number) => {
+  const handleAccept = (requestId: string) => {
+    historyService.updateRequestStatus(requestId, 'accepted');
     setRequests(requests.filter(req => req.id !== requestId));
     toast({
       title: "Request Accepted",
@@ -58,7 +53,8 @@ const OwnerDashboard = () => {
     });
   };
 
-  const handleDecline = (requestId: number) => {
+  const handleDecline = (requestId: string) => {
+    historyService.updateRequestStatus(requestId, 'declined');
     setRequests(requests.filter(req => req.id !== requestId));
     toast({
       title: "Request Declined",

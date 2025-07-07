@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Star, Wifi, Zap, Car, Coffee, User, Clock } from "lucide-react";
@@ -5,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { historyService } from "@/services/historyService";
 import techCafe from "@/assets/tech-cafe.jpg";
 import restaurantWorkspace from "@/assets/restaurant-workspace.jpg";
 import businessLounge from "@/assets/business-lounge.jpg";
@@ -130,6 +132,16 @@ const ShopDetails = () => {
     setIsRequesting(true);
     setTimeout(() => {
       setIsRequesting(false);
+
+      // Record the request in history
+      historyService.addCustomerRequest({
+        shopName: shop.name,
+        customerName: "Current User", // In a real app, this would come from auth
+        requestTime: new Date().toLocaleString(),
+        status: 'pending',
+        address: shop.address
+      });
+
       toast({
         title: "Request Sent!",
         description: "Your seat request has been sent to the shop owner. You'll be notified once they respond.",

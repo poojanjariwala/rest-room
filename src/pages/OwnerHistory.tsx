@@ -1,25 +1,22 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-interface HistoryRequest {
-  id: string;
-  customerName: string;
-  requestTime: string;
-  status: 'pending' | 'accepted' | 'declined';
-  shopName: string;
-}
+import { historyService, HistoryRequest } from "@/services/historyService";
 
 const OwnerHistory = () => {
   const navigate = useNavigate();
-  const [requests] = useState<HistoryRequest[]>([
-    // This will be populated when owner accepts/declines requests
-  ]);
+  const [requests, setRequests] = useState<HistoryRequest[]>([]);
+
+  useEffect(() => {
+    // Load owner history
+    const ownerHistory = historyService.getOwnerHistory();
+    setRequests(ownerHistory);
+  }, []);
 
   const handleLogout = () => {
     navigate('/');

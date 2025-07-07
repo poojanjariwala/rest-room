@@ -1,23 +1,20 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import { Header } from "@/components/Header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin } from "lucide-react";
-
-interface HistoryRequest {
-  id: string;
-  shopName: string;
-  requestTime: string;
-  status: 'pending' | 'accepted' | 'declined';
-  address: string;
-}
+import { historyService, HistoryRequest } from "@/services/historyService";
 
 const History = () => {
-  const [requests] = useState<HistoryRequest[]>([
-    // This will be populated when user clicks "Request Seat" button
-  ]);
+  const [requests, setRequests] = useState<HistoryRequest[]>([]);
+
+  useEffect(() => {
+    // Load customer history
+    const customerHistory = historyService.getCustomerHistory();
+    setRequests(customerHistory);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
