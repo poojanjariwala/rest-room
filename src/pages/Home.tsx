@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, MapPin, Star, Wifi, Zap, Car, Coffee, User, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -247,12 +246,9 @@ const Home = () => {
                           </div>
                         </div>
                         
-                        <div className="text-right flex flex-col items-end gap-1">
+                        <div className="text-right">
                           <div className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">
                             {shop.distance}km
-                          </div>
-                          <div className="bg-success/10 text-success px-2 py-1 rounded-full text-xs font-medium">
-                            {shop.availableSeats}/{shop.totalSeats}
                           </div>
                         </div>
                       </div>
