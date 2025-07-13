@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
-import { DesktopSidebar } from "@/components/DesktopSidebar";
 import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -98,13 +97,10 @@ const History = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-gray-50">
-        <DesktopSidebar />
-        <div className="flex flex-col flex-1">
-          <Header title="Request History" />
-          <div className="flex items-center justify-center flex-1">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-          </div>
+      <div className="flex flex-col h-screen bg-white">
+        <Header title="RestRoom" subtitle="History" showLogo={true} />
+        <div className="flex items-center justify-center flex-1">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
         </div>
         <BottomNav />
       </div>
@@ -112,84 +108,58 @@ const History = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <DesktopSidebar />
-      <div className="flex flex-col flex-1">
-        <Header title="Request History" />
-        <main className="flex-1 overflow-auto p-6 pb-20 md:pb-6">
-          <div className="space-y-6">
-
-        <div className="space-y-4">
-          {requests.map((request) => (
-            <Card key={request.id}>
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={request.shops.photo_url || "/placeholder.svg"}
-                      alt={request.shops.name}
-                      className="w-12 h-12 rounded-lg object-cover"
-                    />
-                    <div>
-                      <CardTitle className="text-lg">{request.shops.name}</CardTitle>
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <MapPin className="h-3 w-3" />
-                        <span className="text-sm">{request.shops.address}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(request.status)}
-                    <Badge className={getStatusColor(request.status)}>
-                      {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    <span>Requested: {formatDate(request.requested_at)}</span>
-                  </div>
-                  
-                  {request.approved_at && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <CheckCircle className="h-4 w-4" />
-                      <span>Approved: {formatDate(request.approved_at)}</span>
-                    </div>
-                  )}
-                  
-                  {request.completed_at && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <CheckCircle className="h-4 w-4" />
-                      <span>Completed: {formatDate(request.completed_at)}</span>
-                    </div>
-                  )}
-
-                  {request.notes && (
-                    <div className="mt-3 p-3 bg-muted rounded-lg">
-                      <p className="text-sm font-medium mb-1">Notes:</p>
-                      <p className="text-sm text-muted-foreground">{request.notes}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {requests.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">No seat requests yet</p>
-            <p className="text-muted-foreground text-sm mt-2">
-              Start by requesting a seat at one of our partner shops
+    <div className="flex flex-col h-screen bg-white">
+      <Header title="RestRoom" subtitle="History" showLogo={true} />
+      
+      <div className="flex-1 overflow-auto pb-20">
+        {requests.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <Clock className="h-8 w-8 text-gray-400" />
+            </div>
+            <p className="text-gray-500 text-lg">No History Yet</p>
+            <p className="text-gray-400 text-sm mt-2 text-center px-8">
+              Your booking history will appear here once you start making seat requests.
             </p>
           </div>
-        )}
+        ) : (
+          <div className="p-4 space-y-4">
+            {requests.map((request) => (
+              <div key={request.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                <div className="flex space-x-3">
+                  <img
+                    src={request.shops.photo_url || "/placeholder.svg"}
+                    alt={request.shops.name}
+                    className="w-12 h-12 rounded-lg object-cover"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900">{request.shops.name}</h3>
+                    <div className="flex items-center space-x-1 text-gray-500">
+                      <MapPin className="h-3 w-3" />
+                      <span className="text-sm">{request.shops.address}</span>
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-gray-500">
+                        {formatDate(request.requested_at)}
+                      </span>
+                      <span className={`px-2 py-1 text-xs rounded ${
+                        request.status === 'approved' || request.status === 'completed' 
+                          ? 'bg-green-100 text-green-800'
+                          : request.status === 'rejected'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </main>
+        )}
       </div>
+      
       <BottomNav />
     </div>
   );

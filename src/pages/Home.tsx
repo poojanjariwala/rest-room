@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
-import { DesktopSidebar } from "@/components/DesktopSidebar";
 import { BottomNav } from "@/components/BottomNav";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { FilterModal } from "@/components/FilterModal";
 import { Button } from "@/components/ui/button";
-
+import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Wifi, Zap, Coffee, Volume2, Car } from "lucide-react";
+import { Search, Filter, MapPin, Wifi, Zap, Coffee, Volume2, Car, Star, Clock } from "lucide-react";
 
 interface Shop {
   id: string;
@@ -30,12 +28,21 @@ const Home = () => {
   const [shops, setShops] = useState<Shop[]>([]);
   const [filteredShops, setFilteredShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [filters, setFilters] = useState({
-    wifi: false,
-    power: false,
-    food: false,
-    quiet: false,
-    parking: false,
+    shopType: "all",
+    sortBy: "distance",
+    maxDistance: 5,
+    minRating: 1,
+    amenities: {
+      ac: false,
+      wifi: false,
+      parking: false,
+      food: false,
+      charging: false,
+      washroom: false,
+    },
   });
 
   useEffect(() => {
@@ -44,7 +51,7 @@ const Home = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [filters, shops]);
+  }, [filters, shops, searchQuery]);
 
   const fetchShops = async () => {
     try {
@@ -70,19 +77,25 @@ const Home = () => {
   const applyFilters = () => {
     let filtered = shops;
 
-    if (filters.wifi) {
+    // Search filter
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(shop => 
+        shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        shop.address.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Amenity filters
+    if (filters.amenities.wifi) {
       filtered = filtered.filter(shop => shop.wifi_available);
     }
-    if (filters.power) {
+    if (filters.amenities.charging) {
       filtered = filtered.filter(shop => shop.power_outlets);
     }
-    if (filters.food) {
+    if (filters.amenities.food) {
       filtered = filtered.filter(shop => shop.food_available);
     }
-    if (filters.quiet) {
-      filtered = filtered.filter(shop => shop.quiet_environment);
-    }
-    if (filters.parking) {
+    if (filters.amenities.parking) {
       filtered = filtered.filter(shop => shop.parking_available);
     }
 
@@ -96,28 +109,45 @@ const Home = () => {
   const renderAmenities = (shop: Shop) => {
     const amenities = [];
     if (shop.wifi_available) amenities.push({ icon: Wifi, label: "WiFi" });
-    if (shop.power_outlets) amenities.push({ icon: Zap, label: "Power" });
+    if (shop.power_outlets) amenities.push({ icon: Zap, label: "Charging" });
     if (shop.food_available) amenities.push({ icon: Coffee, label: "Food" });
-    if (shop.quiet_environment) amenities.push({ icon: Volume2, label: "Quiet" });
     if (shop.parking_available) amenities.push({ icon: Car, label: "Parking" });
 
-    return amenities.slice(0, 3).map((amenity, index) => (
-      <Badge key={index} variant="secondary" className="text-xs">
-        <amenity.icon className="w-3 h-3 mr-1" />
-        {amenity.label}
-      </Badge>
-    ));
+    return amenities;
+  };
+
+  const handleFiltersChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+  };
+
+  const handleApplyFilters = () => {
+    applyFilters();
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      shopType: "all",
+      sortBy: "distance",
+      maxDistance: 5,
+      minRating: 1,
+      amenities: {
+        ac: false,
+        wifi: false,
+        parking: false,
+        food: false,
+        charging: false,
+        washroom: false,
+      },
+    });
+    setSearchQuery("");
   };
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-gray-50">
-        <DesktopSidebar />
-        <div className="flex flex-col flex-1">
-          <Header title="Find Your Perfect Spot" />
-          <div className="flex items-center justify-center flex-1">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-          </div>
+      <div className="flex flex-col h-screen bg-white">
+        <Header title="RestRoom" subtitle="Surat, Gujarat" showLogo={true} />
+        <div className="flex items-center justify-center flex-1">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
         </div>
         <BottomNav />
       </div>
@@ -125,111 +155,124 @@ const Home = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <DesktopSidebar />
-      <div className="flex flex-col flex-1">
-        <Header title="Find Your Perfect Spot" />
-        <main className="flex-1 overflow-auto p-6 pb-20 md:pb-6">
-          <div className="space-y-6">
-
-        <div className="flex flex-wrap gap-2">
+    <div className="flex flex-col h-screen bg-white">
+      <Header title="RestRoom" subtitle="Surat, Gujarat" showLogo={true} />
+      
+      {/* Search Bar */}
+      <div className="p-4 bg-white border-b border-gray-100">
+        <div className="flex space-x-3">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <Input
+              placeholder="Search shops or areas..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 rounded-lg border-gray-200"
+            />
+          </div>
           <Button
-            variant={filters.wifi ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilters(prev => ({ ...prev, wifi: !prev.wifi }))}
+            variant="outline"
+            onClick={() => setIsFilterModalOpen(true)}
+            className="px-4 rounded-lg border-gray-200"
           >
-            <Wifi className="w-4 h-4 mr-2" />
-            WiFi
-          </Button>
-          <Button
-            variant={filters.power ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilters(prev => ({ ...prev, power: !prev.power }))}
-          >
-            <Zap className="w-4 h-4 mr-2" />
-            Power
-          </Button>
-          <Button
-            variant={filters.food ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilters(prev => ({ ...prev, food: !prev.food }))}
-          >
-            <Coffee className="w-4 h-4 mr-2" />
-            Food
-          </Button>
-          <Button
-            variant={filters.quiet ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilters(prev => ({ ...prev, quiet: !prev.quiet }))}
-          >
-            <Volume2 className="w-4 h-4 mr-2" />
-            Quiet
-          </Button>
-          <Button
-            variant={filters.parking ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilters(prev => ({ ...prev, parking: !prev.parking }))}
-          >
-            <Car className="w-4 h-4 mr-2" />
-            Parking
+            <Filter className="h-5 w-5 mr-2" />
+            Filter
           </Button>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredShops.map((shop) => (
-            <Card 
-              key={shop.id} 
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => handleShopClick(shop.id)}
-            >
-              <div className="aspect-video relative overflow-hidden rounded-t-lg">
+      {/* Shop List */}
+      <div className="flex-1 overflow-auto pb-20">
+        {filteredShops.map((shop, index) => (
+          <div
+            key={shop.id}
+            className="p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50"
+            onClick={() => handleShopClick(shop.id)}
+          >
+            <div className="flex space-x-3">
+              {/* Shop Image */}
+              <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                 <img
                   src={shop.photo_url || "/placeholder.svg"}
                   alt={shop.name}
                   className="w-full h-full object-cover"
                 />
               </div>
-              <CardContent className="p-4">
-                <h3 className="font-semibold text-lg mb-2">{shop.name}</h3>
-                <div className="flex items-start gap-2 mb-3">
-                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-muted-foreground line-clamp-2">{shop.address}</p>
-                </div>
-                
-                {shop.description && (
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                    {shop.description}
-                  </p>
-                )}
 
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {renderAmenities(shop)}
-                </div>
+              {/* Shop Details */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg text-gray-900">{shop.name}</h3>
+                    <div className="flex items-center space-x-1 mt-1">
+                      <MapPin className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm text-gray-500 truncate">{shop.address}</span>
+                    </div>
+                    
+                    {/* Rating and Category */}
+                    <div className="flex items-center space-x-2 mt-2">
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                        <span className="text-sm font-medium">4.{Math.floor(Math.random() * 5) + 3}</span>
+                      </div>
+                      <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                        {shop.food_available ? "Cafe" : "Restaurant"}
+                      </span>
+                    </div>
 
-                <Button className="w-full" onClick={() => handleShopClick(shop.id)}>
-                  Request Seat
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                    {/* Amenities */}
+                    <div className="flex items-center space-x-3 mt-2">
+                      {renderAmenities(shop).map((amenity, idx) => (
+                        <div key={idx} className="flex items-center space-x-1">
+                          <amenity.icon className="h-4 w-4 text-gray-600" />
+                          <span className="text-xs text-gray-600">{amenity.label}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Timing and Price */}
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-center space-x-1">
+                        <Clock className="h-4 w-4 text-gray-400" />
+                        <span className="text-xs text-gray-500">8:00 AM - 11:00 PM</span>
+                      </div>
+                      <div className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
+                        ₹50/hr
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Distance */}
+                  <div className="text-sm text-blue-500 font-medium ml-2">
+                    {(Math.random() * 2 + 0.1).toFixed(1)}km
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
 
         {filteredShops.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">No shops found matching your criteria</p>
-            <Button 
-              variant="outline" 
-              onClick={() => setFilters({ wifi: false, power: false, food: false, quiet: false, parking: false })}
-              className="mt-4"
-            >
+          <div className="flex flex-col items-center justify-center py-20">
+            <p className="text-gray-500 text-lg mb-4">No shops found</p>
+            <Button variant="outline" onClick={handleClearFilters}>
               Clear Filters
             </Button>
           </div>
         )}
-          </div>
-        </main>
       </div>
+
       <BottomNav />
+
+      {/* Filter Modal */}
+      <FilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
+        onApplyFilters={handleApplyFilters}
+        onClearFilters={handleClearFilters}
+      />
     </div>
   );
 };
