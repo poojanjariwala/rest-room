@@ -1,26 +1,12 @@
 
 import { User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { BottomNav } from "@/components/BottomNav";
-import { Header } from "@/components/Header";
-import { useNavigate } from "react-router-dom";
+import { AppLayout } from "@/components/AppLayout";
 
 const OwnerAccount = () => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    navigate('/');
-  };
-
   return (
-    <div className="min-h-screen bg-background">
-      <Header 
-        title="RestRoom"
-        showLogout={true}
-        onLogout={handleLogout}
-      />
-
-      <div className="p-4 pb-20">
+    <AppLayout isOwner={true}>
+      <div className="p-6">
         {/* Profile Section */}
         <div className="text-center mb-6">
           <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
@@ -55,9 +41,7 @@ const OwnerAccount = () => {
           </CardContent>
         </Card>
       </div>
-
-      <BottomNav isOwner={true} />
-    </div>
+    </AppLayout>
   );
 };
 

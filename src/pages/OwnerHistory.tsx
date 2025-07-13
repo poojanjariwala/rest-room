@@ -1,15 +1,12 @@
 
 import { useState, useEffect } from "react";
-import { BottomNav } from "@/components/BottomNav";
-import { Header } from "@/components/Header";
+import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { historyService, HistoryRequest } from "@/services/historyService";
 
 const OwnerHistory = () => {
-  const navigate = useNavigate();
   const [requests, setRequests] = useState<HistoryRequest[]>([]);
 
   useEffect(() => {
@@ -18,20 +15,9 @@ const OwnerHistory = () => {
     setRequests(ownerHistory);
   }, []);
 
-  const handleLogout = () => {
-    navigate('/');
-  };
-
   return (
-    <div className="min-h-screen bg-background">
-      <Header 
-        title="RestRoom"
-        subtitle="History"
-        showLogout={true}
-        onLogout={handleLogout}
-      />
-      
-      <div className="p-4 pb-20">
+    <AppLayout isOwner={true}>
+      <div className="p-6">
         {requests.length > 0 ? (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Request History</h3>
@@ -71,9 +57,7 @@ const OwnerHistory = () => {
           </div>
         )}
       </div>
-
-      <BottomNav isOwner={true} />
-    </div>
+    </AppLayout>
   );
 };
 
