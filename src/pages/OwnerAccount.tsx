@@ -1,12 +1,17 @@
 
 import { User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { AppLayout } from "@/components/AppLayout";
+import { Header } from "@/components/Header";
+import { DesktopSidebar } from "@/components/DesktopSidebar";
+import { BottomNav } from "@/components/BottomNav";
 
 const OwnerAccount = () => {
   return (
-    <AppLayout isOwner={true}>
-      <div className="p-6">
+    <div className="flex h-screen bg-gray-50">
+      <DesktopSidebar isOwner />
+      <div className="flex flex-col flex-1">
+        <Header title="Account Settings" />
+        <main className="flex-1 overflow-auto p-6 pb-20 md:pb-6">
         {/* Profile Section */}
         <div className="text-center mb-6">
           <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
@@ -40,8 +45,10 @@ const OwnerAccount = () => {
             </div>
           </CardContent>
         </Card>
+        </main>
       </div>
-    </AppLayout>
+      <BottomNav isOwner />
+    </div>
   );
 };
 

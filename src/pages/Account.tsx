@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { AppLayout } from "@/components/AppLayout";
+import { Header } from "@/components/Header";
+import { DesktopSidebar } from "@/components/DesktopSidebar";
+import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,21 +118,26 @@ const Account = () => {
 
   if (loading && !profile) {
     return (
-      <AppLayout>
-        <div className="flex items-center justify-center min-h-96">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="flex h-screen bg-gray-50">
+        <DesktopSidebar />
+        <div className="flex flex-col flex-1">
+          <Header title="My Account" />
+          <div className="flex items-center justify-center flex-1">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          </div>
         </div>
-      </AppLayout>
+        <BottomNav />
+      </div>
     );
   }
 
   return (
-    <AppLayout>
-      <div className="p-6 space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">My Account</h1>
-          <p className="text-muted-foreground">Manage your account information</p>
-        </div>
+    <div className="flex h-screen bg-gray-50">
+      <DesktopSidebar />
+      <div className="flex flex-col flex-1">
+        <Header title="My Account" />
+        <main className="flex-1 overflow-auto p-6 pb-20 md:pb-6">
+          <div className="space-y-6">
 
         <Card>
           <CardHeader>
@@ -231,8 +238,11 @@ const Account = () => {
             )}
           </CardContent>
         </Card>
+          </div>
+        </main>
       </div>
-    </AppLayout>
+      <BottomNav />
+    </div>
   );
 };
 

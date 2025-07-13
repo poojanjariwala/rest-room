@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { AppLayout } from "@/components/AppLayout";
+import { Header } from "@/components/Header";
+import { DesktopSidebar } from "@/components/DesktopSidebar";
+import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin } from "lucide-react";
@@ -16,8 +18,11 @@ const OwnerHistory = () => {
   }, []);
 
   return (
-    <AppLayout isOwner={true}>
-      <div className="p-6">
+    <div className="flex h-screen bg-gray-50">
+      <DesktopSidebar isOwner />
+      <div className="flex flex-col flex-1">
+        <Header title="Request History" />
+        <main className="flex-1 overflow-auto p-6 pb-20 md:pb-6">
         {requests.length > 0 ? (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Request History</h3>
@@ -56,8 +61,10 @@ const OwnerHistory = () => {
             </p>
           </div>
         )}
+        </main>
       </div>
-    </AppLayout>
+      <BottomNav isOwner />
+    </div>
   );
 };
 
