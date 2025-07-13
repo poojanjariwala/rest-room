@@ -1,293 +1,226 @@
-import { useState } from "react";
-import { Search, MapPin, Star, Wifi, Zap, Car, Coffee, User, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect } from "react";
+import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BottomNav } from "@/components/BottomNav";
-import { Header } from "@/components/Header";
-import { Filter } from "@/components/Filter";
-import { DesktopSidebar } from "@/components/DesktopSidebar";
+import { Button } from "@/components/ui/button";
+
 import { useNavigate } from "react-router-dom";
-import techCafe from "@/assets/tech-cafe.jpg";
-import restaurantWorkspace from "@/assets/restaurant-workspace.jpg";
-import businessLounge from "@/assets/business-lounge.jpg";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { MapPin, Wifi, Zap, Coffee, Volume2, Car } from "lucide-react";
 
-const shops = [
-  {
-    id: 1,
-    name: "Tech Hub Cafe",
-    address: "Ring Road, Surat",
-    distance: "0.2",
-    type: "Cafe",
-    rating: 4.3,
-    reviews: 156,
-    availableSeats: 25,
-    totalSeats: 30,
-    price: 50,
-    amenities: ["AC", "WiFi", "Charging", "Food"],
-    hours: "8:00 AM - 11:00 PM",
-    image: techCafe
-  },
-  {
-    id: 2,
-    name: "Diamond City Rest",
-    address: "Athwa Lines, Surat",
-    distance: "0.9",
-    type: "Restaurant",
-    rating: 4.6,
-    reviews: 89,
-    availableSeats: 12,
-    totalSeats: 18,
-    price: 50,
-    amenities: ["AC", "Parking", "Washroom"],
-    hours: "7:30 AM - 10:30 PM",
-    image: restaurantWorkspace
-  },
-  {
-    id: 3,
-    name: "Relax Zone Surat",
-    address: "Citylight, Surat",
-    distance: "1.5",
-    type: "Cafe",
-    rating: 4.4,
-    reviews: 203,
-    availableSeats: 16,
-    totalSeats: 22,
-    price: 50,
-    amenities: ["AC", "WiFi", "Food", "Charging"],
-    hours: "9:00 AM - 12:00 AM",
-    image: businessLounge
-  },
-  {
-    id: 4,
-    name: "Coffee Corner",
-    address: "Varachha Road, Surat",
-    distance: "2.1",
-    type: "Cafe",
-    rating: 4.2,
-    reviews: 78,
-    availableSeats: 8,
-    totalSeats: 15,
-    price: 50,
-    amenities: ["WiFi", "Charging", "Food"],
-    hours: "7:00 AM - 10:00 PM",
-    image: techCafe
-  },
-  {
-    id: 5,
-    name: "Business Hub",
-    address: "Adajan, Surat",
-    distance: "3.2",
-    type: "Business Lounge",
-    rating: 4.7,
-    reviews: 145,
-    availableSeats: 20,
-    totalSeats: 25,
-    price: 50,
-    amenities: ["AC", "WiFi", "Charging", "Parking"],
-    hours: "6:00 AM - 11:00 PM",
-    image: businessLounge
-  },
-  {
-    id: 6,
-    name: "Quick Bite Cafe",
-    address: "Katargam, Surat",
-    distance: "4.0",
-    type: "Restaurant",
-    rating: 4.1,
-    reviews: 92,
-    availableSeats: 14,
-    totalSeats: 20,
-    price: 50,
-    amenities: ["AC", "Food", "Washroom"],
-    hours: "8:00 AM - 10:30 PM",
-    image: restaurantWorkspace
-  }
-];
-
-const amenityIcons = {
-  AC: Zap,
-  WiFi: Wifi,
-  Parking: Car,
-  Food: Coffee,
-  Charging: Zap,
-  Washroom: User
-};
-
-const typeColors = {
-  'Cafe': 'bg-orange-100 text-orange-800',
-  'Restaurant': 'bg-green-100 text-green-800',
-  'Business Lounge': 'bg-purple-100 text-purple-800',
-  'Barber Shop': 'bg-blue-100 text-blue-800',
-  'Chai Stall': 'bg-yellow-100 text-yellow-800'
-};
+interface Shop {
+  id: string;
+  name: string;
+  description: string;
+  address: string;
+  photo_url: string;
+  wifi_available: boolean;
+  power_outlets: boolean;
+  food_available: boolean;
+  quiet_environment: boolean;
+  parking_available: boolean;
+}
 
 const Home = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredShops, setFilteredShops] = useState(shops);
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [shops, setShops] = useState<Shop[]>([]);
+  const [filteredShops, setFilteredShops] = useState<Shop[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    wifi: false,
+    power: false,
+    food: false,
+    quiet: false,
+    parking: false,
+  });
 
-  const handleShopClick = (shopId: number) => {
-    navigate(`/shop/${shopId}`);
+  useEffect(() => {
+    fetchShops();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [filters, shops]);
+
+  const fetchShops = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('shops')
+        .select('*')
+        .eq('is_active', true);
+
+      if (error) throw error;
+      setShops(data || []);
+    } catch (error) {
+      console.error('Error fetching shops:', error);
+      toast({
+        title: "Error loading shops",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleLogout = () => {
-    navigate('/');
-  };
-
-  const handleFilterChange = (filters: any) => {
+  const applyFilters = () => {
     let filtered = shops;
-    
-    if (filters.type && filters.type !== 'All Types') {
-      filtered = filtered.filter(shop => shop.type === filters.type);
+
+    if (filters.wifi) {
+      filtered = filtered.filter(shop => shop.wifi_available);
     }
-    
-    if (filters.amenities && filters.amenities.length > 0) {
-      filtered = filtered.filter(shop => 
-        filters.amenities.some((amenity: string) => {
-          const amenityMap: { [key: string]: string } = {
-            'Air Conditioning': 'AC',
-            'WiFi': 'WiFi',
-            'Parking': 'Parking',
-            'Food Available': 'Food',
-            'Charging Points': 'Charging',
-            'Washroom': 'Washroom'
-          };
-          return shop.amenities.includes(amenityMap[amenity] || amenity);
-        })
-      );
+    if (filters.power) {
+      filtered = filtered.filter(shop => shop.power_outlets);
     }
-    
-    // Sort by selected option
-    if (filters.sortBy === 'Rating') {
-      filtered.sort((a, b) => b.rating - a.rating);
-    } else if (filters.sortBy === 'Availability') {
-      filtered.sort((a, b) => b.availableSeats - a.availableSeats);
-    } else {
-      filtered.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+    if (filters.food) {
+      filtered = filtered.filter(shop => shop.food_available);
     }
-    
+    if (filters.quiet) {
+      filtered = filtered.filter(shop => shop.quiet_environment);
+    }
+    if (filters.parking) {
+      filtered = filtered.filter(shop => shop.parking_available);
+    }
+
     setFilteredShops(filtered);
   };
 
-  const searchFilteredShops = filteredShops.filter(shop => 
-    shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    shop.address.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleShopClick = (shopId: string) => {
+    navigate(`/shop/${shopId}`);
+  };
+
+  const renderAmenities = (shop: Shop) => {
+    const amenities = [];
+    if (shop.wifi_available) amenities.push({ icon: Wifi, label: "WiFi" });
+    if (shop.power_outlets) amenities.push({ icon: Zap, label: "Power" });
+    if (shop.food_available) amenities.push({ icon: Coffee, label: "Food" });
+    if (shop.quiet_environment) amenities.push({ icon: Volume2, label: "Quiet" });
+    if (shop.parking_available) amenities.push({ icon: Car, label: "Parking" });
+
+    return amenities.slice(0, 3).map((amenity, index) => (
+      <Badge key={index} variant="secondary" className="text-xs">
+        <amenity.icon className="w-3 h-3 mr-1" />
+        {amenity.label}
+      </Badge>
+    ));
+  };
+
+  if (loading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-96">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
-      <DesktopSidebar />
-      
-      <div className="lg:pl-80">
-        <Header 
-          title="RestRoom"
-          subtitle="Surat, Gujarat"
-          showLogout={true}
-          onLogout={handleLogout}
-          logoHeight="w-12 h-8"
-        />
-
-        {/* Search Section */}
-        <div className="p-4 space-y-4">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search shops or areas..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Filter onFilterChange={handleFilterChange} />
-          </div>
+    <AppLayout>
+      <div className="p-6 space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Find Your Perfect Spot</h1>
+          <p className="text-muted-foreground">Discover nearby shops with available seats</p>
         </div>
 
-        {/* Shop Listings */}
-        <div className="px-4 pb-20 lg:pb-4 space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {searchFilteredShops.map((shop) => (
-              <Card 
-                key={shop.id} 
-                className="cursor-pointer transition-all hover:shadow-lg"
-                onClick={() => handleShopClick(shop.id)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex gap-3">
-                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                      <img 
-                        src={shop.image} 
-                        alt={shop.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-foreground">{shop.name}</h3>
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
-                            <MapPin className="h-3 w-3" />
-                            <span>{shop.address}</span>
-                          </div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="flex items-center gap-1">
-                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                              <span className="text-sm font-medium">{shop.rating}</span>
-                            </div>
-                            <Badge 
-                              variant="outline" 
-                              className={`text-xs px-2 py-0.5 ${typeColors[shop.type as keyof typeof typeColors] || 'bg-gray-100 text-gray-800'}`}
-                            >
-                              {shop.type}
-                            </Badge>
-                          </div>
-                        </div>
-                        
-                        <div className="text-right">
-                          <div className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">
-                            {shop.distance}km
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Amenities */}
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        {shop.amenities.slice(0, 4).map((amenity) => {
-                          const Icon = amenityIcons[amenity as keyof typeof amenityIcons];
-                          return (
-                            <Badge key={amenity} variant="outline" className="text-xs flex items-center gap-1">
-                              <Icon className="h-3 w-3" />
-                              {amenity}
-                            </Badge>
-                          );
-                        })}
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-                          <Clock className="h-3 w-3" />
-                          <span>{shop.hours}</span>
-                        </div>
-                        <div className="bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
-                          ₹{shop.price}/hr
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={filters.wifi ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilters(prev => ({ ...prev, wifi: !prev.wifi }))}
+          >
+            <Wifi className="w-4 h-4 mr-2" />
+            WiFi
+          </Button>
+          <Button
+            variant={filters.power ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilters(prev => ({ ...prev, power: !prev.power }))}
+          >
+            <Zap className="w-4 h-4 mr-2" />
+            Power
+          </Button>
+          <Button
+            variant={filters.food ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilters(prev => ({ ...prev, food: !prev.food }))}
+          >
+            <Coffee className="w-4 h-4 mr-2" />
+            Food
+          </Button>
+          <Button
+            variant={filters.quiet ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilters(prev => ({ ...prev, quiet: !prev.quiet }))}
+          >
+            <Volume2 className="w-4 h-4 mr-2" />
+            Quiet
+          </Button>
+          <Button
+            variant={filters.parking ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilters(prev => ({ ...prev, parking: !prev.parking }))}
+          >
+            <Car className="w-4 h-4 mr-2" />
+            Parking
+          </Button>
         </div>
-      </div>
 
-      <div className="lg:hidden">
-        <BottomNav />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredShops.map((shop) => (
+            <Card 
+              key={shop.id} 
+              className="cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => handleShopClick(shop.id)}
+            >
+              <div className="aspect-video relative overflow-hidden rounded-t-lg">
+                <img
+                  src={shop.photo_url || "/placeholder.svg"}
+                  alt={shop.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-lg mb-2">{shop.name}</h3>
+                <div className="flex items-start gap-2 mb-3">
+                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-muted-foreground line-clamp-2">{shop.address}</p>
+                </div>
+                
+                {shop.description && (
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                    {shop.description}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {renderAmenities(shop)}
+                </div>
+
+                <Button className="w-full" onClick={() => handleShopClick(shop.id)}>
+                  Request Seat
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {filteredShops.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">No shops found matching your criteria</p>
+            <Button 
+              variant="outline" 
+              onClick={() => setFilters({ wifi: false, power: false, food: false, quiet: false, parking: false })}
+              className="mt-4"
+            >
+              Clear Filters
+            </Button>
+          </div>
+        )}
       </div>
-    </div>
+    </AppLayout>
   );
 };
 

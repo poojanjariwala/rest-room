@@ -14,7 +14,161 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+          user_type: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          user_type: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          user_type?: string
+        }
+        Relationships: []
+      }
+      seat_requests: {
+        Row: {
+          approved_at: string | null
+          completed_at: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          notes: string | null
+          requested_at: string
+          shop_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          notes?: string | null
+          requested_at?: string
+          shop_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          notes?: string | null
+          requested_at?: string
+          shop_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seat_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "seat_requests_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shops: {
+        Row: {
+          address: string
+          created_at: string
+          description: string | null
+          food_available: boolean | null
+          id: string
+          is_active: boolean | null
+          name: string
+          owner_id: string
+          parking_available: boolean | null
+          phone: string | null
+          photo_url: string | null
+          power_outlets: boolean | null
+          quiet_environment: boolean | null
+          total_seats: number
+          updated_at: string
+          wifi_available: boolean | null
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          description?: string | null
+          food_available?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          owner_id: string
+          parking_available?: boolean | null
+          phone?: string | null
+          photo_url?: string | null
+          power_outlets?: boolean | null
+          quiet_environment?: boolean | null
+          total_seats?: number
+          updated_at?: string
+          wifi_available?: boolean | null
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          description?: string | null
+          food_available?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          owner_id?: string
+          parking_available?: boolean | null
+          phone?: string | null
+          photo_url?: string | null
+          power_outlets?: boolean | null
+          quiet_environment?: boolean | null
+          total_seats?: number
+          updated_at?: string
+          wifi_available?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shops_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

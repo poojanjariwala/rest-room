@@ -24,11 +24,11 @@ const Index = () => {
           <div className="w-24 h-24 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
             <img 
               src="/lovable-uploads/23b453e4-446a-4f0b-adec-4130e91c2bfa.png" 
-              alt="RestRoom Logo" 
+              alt="LazySpot Logo" 
               className="w-16 h-16"
             />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to RestRoom</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to LazySpot</h1>
           <p className="text-gray-600">Choose your login type</p>
         </div>
 
