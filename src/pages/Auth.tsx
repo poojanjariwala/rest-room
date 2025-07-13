@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { ArrowLeft, X, User, Store } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, User, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 type AuthMode = 'customer-login' | 'customer-signup' | 'owner-login' | 'owner-signup';
 
@@ -21,14 +23,151 @@ const Auth = () => {
     type === 'owner' ? 'owner-login' : 'customer-login'
   );
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(['WiFi']);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    city: '',
+    state: '',
+    shopName: '',
+    shopAddress: '',
+    shopType: 'Cafe'
+  });
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleCustomerAuth = () => {
-    navigate('/home');
+  // Check if user is already authenticated
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('user_id', session.user.id)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data?.user_type === 'owner') {
+              navigate('/owner-dashboard');
+            } else {
+              navigate('/home');
+            }
+          });
+      }
+    });
+  }, [navigate]);
+
+  const handleLogin = async () => {
+    if (!formData.email || !formData.password) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        // Get user type from profile
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        if (profile?.user_type === 'owner') {
+          navigate('/owner-dashboard');
+        } else {
+          navigate('/home');
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Login Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleOwnerAuth = () => {
-    navigate('/owner-dashboard');
+  const handleSignup = async () => {
+    if (!formData.email || !formData.password || !formData.firstName) {
+      toast({
+        title: "Error",
+        description: "Please fill in required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    const userType = mode.includes('owner') ? 'owner' : 'customer';
+    
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            user_type: userType,
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        toast({
+          title: "Success",
+          description: "Account created successfully!",
+        });
+
+        // If owner, create shop as well
+        if (userType === 'owner' && formData.shopName) {
+          await supabase.from('shops').insert({
+            name: formData.shopName,
+            address: formData.shopAddress,
+            owner_id: data.user.id,
+            wifi_available: selectedAmenities.includes('WiFi'),
+            power_outlets: selectedAmenities.includes('Charging'),
+            food_available: selectedAmenities.includes('Food'),
+            parking_available: selectedAmenities.includes('Parking'),
+            quiet_environment: true,
+          });
+        }
+
+        // Navigate based on user type
+        if (userType === 'owner') {
+          navigate('/owner-dashboard');
+        } else {
+          navigate('/home');
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Signup Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderCustomerLogin = () => (
@@ -49,19 +188,32 @@ const Auth = () => {
           <CardContent className="p-6 space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="Enter your email" />
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+              />
             </div>
             
             <div>
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" placeholder="Enter your password" />
+              <Input 
+                id="password" 
+                type="password" 
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+              />
             </div>
             
             <Button 
               className="w-full" 
-              onClick={handleCustomerAuth}
+              onClick={handleLogin}
+              disabled={loading}
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </Button>
             
             <div className="text-center">
@@ -71,7 +223,7 @@ const Auth = () => {
             <Button 
               variant="outline" 
               className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
-              onClick={handleCustomerAuth}
+              disabled
             >
               <img 
                 src="/lovable-uploads/98076ada-1afe-45dc-b76b-cd228923d9f1.png" 
@@ -114,20 +266,33 @@ const Auth = () => {
         <Card>
           <CardContent className="p-6 space-y-4">
             <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="Enter your email" />
+              <Label htmlFor="owner-email">Email</Label>
+              <Input 
+                id="owner-email" 
+                type="email" 
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+              />
             </div>
             
             <div>
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" placeholder="Enter your password" />
+              <Label htmlFor="owner-password">Password</Label>
+              <Input 
+                id="owner-password" 
+                type="password" 
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+              />
             </div>
             
             <Button 
               className="w-full" 
-              onClick={handleOwnerAuth}
+              onClick={handleLogin}
+              disabled={loading}
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </Button>
             
             <div className="text-center">
@@ -137,7 +302,7 @@ const Auth = () => {
             <Button 
               variant="outline" 
               className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
-              onClick={handleOwnerAuth}
+              disabled
             >
               <img 
                 src="/lovable-uploads/98076ada-1afe-45dc-b76b-cd228923d9f1.png" 
@@ -180,41 +345,68 @@ const Auth = () => {
         <Card>
           <CardContent className="p-6 space-y-4">
             <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" />
+              <Label htmlFor="customer-email">Email</Label>
+              <Input 
+                id="customer-email" 
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+              />
             </div>
             
             <div>
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" />
+              <Label htmlFor="customer-password">Password</Label>
+              <Input 
+                id="customer-password" 
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+              />
             </div>
             
             <div>
-              <Label htmlFor="fullName">Full Name</Label>
-              <Input id="fullName" />
+              <Label htmlFor="customer-fullName">Full Name</Label>
+              <Input 
+                id="customer-fullName"
+                value={formData.firstName}
+                onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+              />
             </div>
             
             <div>
-              <Label htmlFor="mobile">Mobile Number</Label>
-              <Input id="mobile" />
+              <Label htmlFor="customer-mobile">Mobile Number</Label>
+              <Input 
+                id="customer-mobile"
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="city">City</Label>
-              <Input id="city" />
-            </div>
+                <Label htmlFor="customer-city">City</Label>
+                <Input 
+                  id="customer-city"
+                  value={formData.city}
+                  onChange={(e) => setFormData({...formData, city: e.target.value})}
+                />
+              </div>
               <div>
-                <Label htmlFor="state">State</Label>
-                <Input id="state" />
+                <Label htmlFor="customer-state">State</Label>
+                <Input 
+                  id="customer-state"
+                  value={formData.state}
+                  onChange={(e) => setFormData({...formData, state: e.target.value})}
+                />
               </div>
             </div>
             
             <Button 
               className="w-full" 
-              onClick={handleCustomerAuth}
+              onClick={handleSignup}
+              disabled={loading}
             >
-              Sign Up
+              {loading ? "Signing up..." : "Sign Up"}
             </Button>
             
             <div className="text-center">
@@ -224,7 +416,7 @@ const Auth = () => {
             <Button 
               variant="outline" 
               className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
-              onClick={handleCustomerAuth}
+              disabled
             >
               <img 
                 src="/lovable-uploads/98076ada-1afe-45dc-b76b-cd228923d9f1.png" 
@@ -257,49 +449,87 @@ const Auth = () => {
         
         <div className="space-y-4">
           <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" />
+            <Label htmlFor="owner-signup-email">Email</Label>
+            <Input 
+              id="owner-signup-email" 
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+            />
           </div>
           
           <div>
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" />
+            <Label htmlFor="owner-signup-password">Password</Label>
+            <Input 
+              id="owner-signup-password" 
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+            />
           </div>
           
           <div>
-            <Label htmlFor="fullName">Full Name</Label>
-            <Input id="fullName" />
+            <Label htmlFor="owner-fullName">Full Name</Label>
+            <Input 
+              id="owner-fullName"
+              value={formData.firstName}
+              onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+            />
           </div>
           
           <div>
-            <Label htmlFor="mobile">Mobile Number</Label>
-            <Input id="mobile" />
+            <Label htmlFor="owner-mobile">Mobile Number</Label>
+            <Input 
+              id="owner-mobile"
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+            />
           </div>
           
           <div>
-            <Label htmlFor="shopName">Shop Name</Label>
-            <Input id="shopName" />
+            <Label htmlFor="owner-shopName">Shop Name</Label>
+            <Input 
+              id="owner-shopName"
+              value={formData.shopName}
+              onChange={(e) => setFormData({...formData, shopName: e.target.value})}
+            />
           </div>
           
           <div>
-            <Label htmlFor="shopAddress">Shop Address</Label>
-            <Input id="shopAddress" />
+            <Label htmlFor="owner-shopAddress">Shop Address</Label>
+            <Input 
+              id="owner-shopAddress"
+              value={formData.shopAddress}
+              onChange={(e) => setFormData({...formData, shopAddress: e.target.value})}
+            />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="city">City</Label>
-              <Input id="city" />
+              <Label htmlFor="owner-city">City</Label>
+              <Input 
+                id="owner-city"
+                value={formData.city}
+                onChange={(e) => setFormData({...formData, city: e.target.value})}
+              />
             </div>
             <div>
-              <Label htmlFor="state">State</Label>
-              <Input id="state" />
+              <Label htmlFor="owner-state">State</Label>
+              <Input 
+                id="owner-state"
+                value={formData.state}
+                onChange={(e) => setFormData({...formData, state: e.target.value})}
+              />
             </div>
           </div>
           
           <div>
             <Label>Shop Type</Label>
-            <RadioGroup defaultValue="Cafe" className="mt-2">
+            <RadioGroup 
+              value={formData.shopType} 
+              onValueChange={(value) => setFormData({...formData, shopType: value})}
+              className="mt-2"
+            >
               {shopTypes.map((type) => (
                 <div key={type} className="flex items-center space-x-2">
                   <RadioGroupItem value={type} id={type} />
@@ -333,9 +563,10 @@ const Auth = () => {
           
           <Button 
             className="w-full" 
-            onClick={handleOwnerAuth}
+            onClick={handleSignup}
+            disabled={loading}
           >
-            Sign Up
+            {loading ? "Signing up..." : "Sign Up"}
           </Button>
           
           <div className="text-center">
@@ -345,7 +576,7 @@ const Auth = () => {
           <Button 
             variant="outline" 
             className="w-full flex items-center justify-center gap-3 py-3 rounded-full border-2"
-            onClick={handleOwnerAuth}
+            disabled
           >
             <img 
               src="/lovable-uploads/98076ada-1afe-45dc-b76b-cd228923d9f1.png" 

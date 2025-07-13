@@ -31,14 +31,18 @@ const ProtectedRoute = ({ children, isOwner = false }: { children: React.ReactNo
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        // Get user type from profile
+        // Get user type from profile with error handling
         supabase
           .from('profiles')
           .select('user_type')
           .eq('user_id', session.user.id)
-          .single()
-          .then(({ data }) => {
-            setUserType(data?.user_type || null);
+          .maybeSingle()
+          .then(({ data, error }) => {
+            if (!error && data) {
+              setUserType(data.user_type || null);
+            } else {
+              setUserType(null);
+            }
             setLoading(false);
           });
       } else {
@@ -47,19 +51,29 @@ const ProtectedRoute = ({ children, isOwner = false }: { children: React.ReactNo
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('user_type')
-          .eq('user_id', session.user.id)
-          .single();
-        setUserType(data?.user_type || null);
+        // Use setTimeout to avoid potential auth loop
+        setTimeout(() => {
+          supabase
+            .from('profiles')
+            .select('user_type')
+            .eq('user_id', session.user.id)
+            .maybeSingle()
+            .then(({ data, error }) => {
+              if (!error && data) {
+                setUserType(data.user_type || null);
+              } else {
+                setUserType(null);
+              }
+              setLoading(false);
+            });
+        }, 0);
       } else {
         setUserType(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
